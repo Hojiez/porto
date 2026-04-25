@@ -1,7 +1,7 @@
 # rauh. — Personal Portfolio
 
 Single-page portfolio dengan desain dark minimalist, efek glassmorphism, dan beberapa sentuhan interaktif.
-Live: [hojiez.github.io/porto](https://hojiez.github.io/porto) <!-- ganti jika URL berbeda -->
+Live: [hojiez.github.io/porto](https://hojiez.github.io/porto)
 
 ---
 
@@ -24,11 +24,9 @@ Live: [hojiez.github.io/porto](https://hojiez.github.io/porto) <!-- ganti jika U
 | Logic | Vanilla JavaScript |
 | Font | Space Grotesk, DM Mono (Google Fonts) |
 
-Tidak ada framework, tidak ada build tool. Murni satu file.
-
 ---
 
-## Cara Menjalankan
+## How To Run
 
 ```bash
 git clone https://github.com/Hojiez/porto.git
@@ -53,4 +51,4 @@ Untuk mengubah konten (bio, proyek, link sosial) — cukup edit langsung di bagi
 
 ## Lisensi
 
-Free to use sebagai referensi atau template. Kredit tidak wajib, tapi diapresiasi.
+Free to use sebagai referensi atau template. credits not needed, but appreciated.
