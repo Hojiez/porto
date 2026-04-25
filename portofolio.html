@@ -28,6 +28,53 @@
     }
 
     /* ═══════════════════════════════════════════════
+       ENTER OVERLAY
+       ─ Full-screen gate sebelum konten utama
+       ─ z-index: 9999 → selalu di atas semua layer
+    ═══════════════════════════════════════════════ */
+    .enter-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #050505;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      cursor: pointer;
+      transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .enter-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .enter-overlay .enter-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.45em;
+      text-transform: lowercase;
+      color: rgba(255, 255, 255, 0.28);
+      animation: enterPulse 2.8s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .enter-overlay .enter-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      animation: enterPulse 2.8s ease-in-out 0.4s infinite;
+    }
+
+    @keyframes enterPulse {
+      0%, 100% { opacity: 0.3; }
+      50%       { opacity: 1;   }
+    }
+
+    /* ═══════════════════════════════════════════════
        LAYER 0 — BACKGROUND GIF
        ─ Edit src di tag <img id="bg-gif"> di HTML
        ─ Ganti URL GIF kamu di sana
@@ -419,6 +466,16 @@
 </head>
 <body>
 
+<!-- ══════════════════════════════════════════
+       ENTER OVERLAY
+       ─ Klik di mana saja untuk masuk
+  ══════════════════════════════════════════ -->
+  <div class="enter-overlay" id="enter-overlay">
+    <span class="enter-dot"></span>
+    <span class="enter-label">click to enter</span>
+    <span class="enter-dot"></span>
+  </div>
+
   <!-- ══════════════════════════════════════════
        LAYER 0 — BACKGROUND GIF
        ✏️  Ganti URL di src="#" dengan link GIF kamu.
@@ -672,18 +729,13 @@
   ══════════════════════════════════════════════════════════ -->
   <script>
   /* ──────────────────────────────────────────────────────────
-     ✏️  EDIT ZONE — SEMUA YANG PERLU KAMU UBAH ADA DI SINI
+     ✏️  EDIT ZONE
   ────────────────────────────────────────────────────────── */
 
 
-  const BG_GIF_URL = 'https://i.pinimg.com/originals/e4/55/08/e45508119212ed6d7b890af22aac4d6c.gif'; // ← Isi URL GIF kamu di sini (kosongkan = tidak ada GIF)
+  const BG_GIF_URL = 'https://i.pinimg.com/originals/e4/55/08/e45508119212ed6d7b890af22aac4d6c.gif'; // ← Fill your gif link here (empty = no bg)
 
-  // 2. AUDIO TRACKS
-  //    Tambah / ganti URL .mp3 atau .ogg di bawah.
-  //    Tips sumber lagu gratis & direct-link:
-  //      - GitHub raw (upload mp3 ke repo kamu, pakai raw.githubusercontent.com/...)
-  //      - archive.org (cari lagu public domain, copy link download)
-  //      - freemusicarchive.org (beberapa punya direct .mp3)
+  
   const AUDIO_TRACKS = [
     {
       url:   'https://github.com/Hojiez/porto/raw/refs/heads/main/musicc/AZALI%20-%20blossom%20tea.mp3',
@@ -693,11 +745,11 @@
       url:   'https://github.com/Hojiez/porto/raw/refs/heads/main/musicc/terrapin%20new.mp3',
       title: 'terrapin new'
     },
-    // ← Tambah objek { url: '...', title: '...' } di sini untuk lebih banyak lagu
+    // ← add object { url: '...', title: '...' } here for more randomized music
   ];
 
   /* ──────────────────────────────────────────────────────────
-     JANGAN UBAH DI BAWAH INI KALAU TIDAK PERLU
+     DONT CHANGE IF YOU DONT KNOW WHAT YOU'RE DOING
   ────────────────────────────────────────────────────────── */
 
   // ── GIF BACKGROUND ──────────────────────────────────────
@@ -720,10 +772,10 @@
   let isPlaying = false;
   let npTimeout = null;
 
-  // Pick random track
+  // Pick random track — dilakukan di awal, tapi audio belum diplay
   const track = AUDIO_TRACKS[Math.floor(Math.random() * AUDIO_TRACKS.length)];
-  audio.src   = track.url;
-  audio.volume = 0.4;  // ← Volume default (0.0 – 1.0)
+  audio.src    = track.url;
+  audio.volume = 0.4;
   npTitle.textContent = track.title;
 
   // Show now-playing strip temporarily
@@ -736,8 +788,8 @@
   // Switch button icons
   function setPlayingState(playing) {
     isPlaying = playing;
-    iconMuted.style.display  = playing ? 'none'  : 'block';
-    iconPlay.style.display   = playing ? 'block' : 'none';
+    iconMuted.style.display = playing ? 'none'  : 'block';
+    iconPlay.style.display  = playing ? 'block' : 'none';
     audioBtn.classList.toggle('is-playing', playing);
     if (playing) showNowPlaying();
     else nowPlaying.classList.remove('visible');
@@ -753,22 +805,35 @@
     }
   });
 
-  // Autoplay after first user interaction (browser policy)
-  // Also try silent autoplay on load
-  audio.play()
-    .then(() => setPlayingState(true))
-    .catch(() => {
-      // Blocked by browser — wait for first click anywhere
-      const unlockAudio = () => {
-        audio.play().then(() => {
-          setPlayingState(true);
-          document.removeEventListener('click', unlockAudio);
-          document.removeEventListener('keydown', unlockAudio);
-        }).catch(() => {});
-      };
-      document.addEventListener('click', unlockAudio);
-      document.addEventListener('keydown', unlockAudio);
-    });
+  // ── ENTER OVERLAY ────────────────────────────────────────
+ 
+  function startExperience() {
+    const overlay = document.getElementById('enter-overlay');
+
+    // 1. Fade-out overlay
+    overlay.classList.add('fade-out');
+
+    setTimeout(() => overlay.remove(), 750);
+
+    audio.play()
+      .then(() => setPlayingState(true))
+      .catch(() => {
+        // Fallback: jika tetap diblokir
+        const unlockAudio = () => {
+          audio.play().then(() => {
+            setPlayingState(true);
+            document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('keydown', unlockAudio);
+          }).catch(() => {});
+        };
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('keydown', unlockAudio);
+      });
+  }
+
+  // Pasang listener ke overlay
+  document.getElementById('enter-overlay')
+    .addEventListener('click', startExperience);
 
   // ── PARTICLE SYSTEM ──────────────────────────────────────
   (function () {
