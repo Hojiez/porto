@@ -1,7 +1,7 @@
 # rauh. — Personal Portfolio
 
 Single-page portfolio dengan desain dark minimalist, efek glassmorphism, dan beberapa sentuhan interaktif.
-Live: [hojiez.github.io/porto](https://hojiez.github.io/porto)
+Live: https://hojiez.github.io/porto/
 
 ---
 
